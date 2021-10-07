@@ -1,25 +1,28 @@
-Reddit Clone
+Speak
 Section 1 (Functionality of App)
   - User Accounts with Secure Authentication
-    -
-    -
+    - User's have to login with a password
+    - (Security Stuff)
   - Users to see all users who are currently logged in
-    -
-    -
+    - Users can see all current users on the server
+    - (need more ideas)
   - Users can send direct messages (DM) to other users with notifications when a DM is received
-    -
-    -
+    - Users can send messages to other users by clicking on available users
+    - Users can click on users through user's posts and dm user's through there
   - Users can share some form of multimedia content which is stored and hosted on your server
-    -
-    -
+    - Users can post content with images/links
+    - Users can comment under posts
   - Live interactions between users via WebSockets (Cannot be text)
-    -
-    -
+    - Users can upvote other user's posts
+    - Users can click on other people's posts to see more info on it
     
 Section 2 (To-Do List)
+  - Read Functionality and Documentation
 
-Section 3 (Own Ideas)
+Section 3 (Extra Ideas)
+  - Users can gain awards 
+    - Award criteria undetermined
 
 Section 4 (Documentation)
-- Flask (https://flask.palletsprojects.com/en/2.0.x/)
-- Oauth (https://oauth.net/2/)
+  - Flask (https://flask.palletsprojects.com/en/2.0.x/)
+  - Oauth (https://oauth.net/2/)
