@@ -1,1 +1,18 @@
+Reddit Clone
 
+  - User Accounts with Secure Authentication
+    -
+    -
+  - Users to see all users who are currently logged in
+    -
+    -
+  - Users can send direct messages (DM) to other users with notifications when a DM is received
+    -
+    -
+  - Users can share some form of multimedia content which is stored and hosted on your server
+    -
+    -
+  - Live interactions between users via WebSockets (Cannot be text)
+    -
+    -
+    
