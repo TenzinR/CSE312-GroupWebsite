@@ -2,9 +2,12 @@ from flask import Flask, request
 from flask import abort, redirect, url_for
 from flask import render_template
 from handlers import *
-from markupsafe import escape
+from mongoDB import Client
+# from markupsafe import escape
 
 app = Flask(__name__)
+
+client = Client()
 
 
 # home route
@@ -18,7 +21,7 @@ def renderHome():
 def routeLogin():
     if request.method == 'GET':
         return renderLoginForm()
-    return login()
+    return login(client)
 
 
 # register route
@@ -26,7 +29,7 @@ def routeLogin():
 def routeRegister():
     if request.method == 'GET':
         return renderRegisterForm()
-    return register()
+    return register(client)
 
 
 # all chats route
