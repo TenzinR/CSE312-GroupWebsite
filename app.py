@@ -3,11 +3,12 @@ from flask import abort, redirect, url_for
 from flask import render_template
 from handlers import *
 from mongoDB import Client
+
 # from markupsafe import escape
 
 app = Flask(__name__)
 
-client = Client()
+mongoClient = Client()
 
 
 # home route
@@ -21,7 +22,7 @@ def renderHome():
 def routeLogin():
     if request.method == 'GET':
         return renderLoginForm()
-    return login(client)
+    return login(mongoClient)
 
 
 # register route
@@ -29,7 +30,21 @@ def routeLogin():
 def routeRegister():
     if request.method == 'GET':
         return renderRegisterForm()
-    return register(client)
+    return register(mongoClient)
+
+
+# create post
+@app.route('/posts', methods=['GET', 'POST'])
+def routePosts():
+    if request.method == 'GET':
+        return renderPostForm()
+    return createPost(mongoClient)
+
+
+# go to specific post
+@app.route('/posts/<string:postID>')
+def renderPost(postID):
+    return getPost(mongoClient, postID)
 
 
 # all chats route
@@ -47,7 +62,7 @@ def routeChats():
 
 
 # chosen chat route
-@app.route('/chats/<int:chatId>')
+@app.route('/chats/<int:chatID>')
 def renderChat(chatId):
     return getChat(chatId)
 
@@ -60,9 +75,9 @@ def renderChat(chatId):
 #
 
 # TO-DO List:
-# specific subreddit route - reddit.com/r/<subreddit>
-# view all subreddits route - reddit.com/subreddits
-# create subreddit route - reddit.com/subreddits/create
-# list all chatrooms - reddit.com/chats/
-# chatroom route - reddit.com/chats/<chatroomID>
-# create post route - reddit.com/r/<subreddit>/new - renders form page to make a new post, can only post to an existing subreddit
+# Image upload
+# Cookies
+# Chats
+# Comments
+# Flash
+# Security

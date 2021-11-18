@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 
 class Client:
@@ -12,23 +13,25 @@ class Client:
         self.post_collection = self.db.post_collection
 
 
-def registerUser(client, user):
+#
+def registerUser(mongoClient, user):
     #user is a dictionary ex: {'username': Tenzin, 'password' : MyCoolPassword}
     #TO-DO: check if username exists
-    usernameTaken = client.user_collection.find_one(
+    usernameTaken = mongoClient.user_collection.find_one(
         {"username": user['username']})
     if usernameTaken:
         print("Registration Failed")
         return False  #need to add something to show user on client side that username is taken
-    client.user_collection.insert_one(user)
+    mongoClient.user_collection.insert_one(user)
     print("Registration Successful!")
     return True
 
 
-def loginUser(client, user):
+#
+def loginUser(mongoClient, user):
     #user is a dictionary ex: {'username': Tenzin, 'password' : MyCoolPassword}
     print(user)
-    userInsideCollection = client.user_collection.find_one({
+    userInsideCollection = mongoClient.user_collection.find_one({
         "username":
         user['username'],
         "password":
@@ -40,3 +43,15 @@ def loginUser(client, user):
         return True
     print("Login Fail")
     return False  #need to add something to show that user on client side that they cannot login (wrong username or password)
+
+
+#
+def mongoCreatePost(mongoClient, post):
+    postID = mongoClient.post_collection.insert_one(post).inserted_id
+    print("successful post", postID)
+    return postID
+
+
+#
+def mongoGetPost(mongoClient, postID):
+    return mongoClient.post_collection.find_one({"_id": ObjectId(postID)})
