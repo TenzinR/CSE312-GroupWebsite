@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import bcrypt
 
 
 class Client:
@@ -13,36 +14,58 @@ class Client:
         self.post_collection = self.db.post_collection
 
 
+def hashPassword(password):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode(), salt)
+    return hashed.decode()
+
+
+def checkPassword(userObj, dbUser):
+    return bcrypt.checkpw(userObj['password'].encode(),
+                          dbUser['password'].encode())
+
+
+def validateToken(mongoClient, token):
+    userList = getAllUsers(mongoClient)
+    for user in userList:
+        if bcrypt.checkpw(str(user['_id']).encode(), token.encode()):
+            return True
+    return False
+
+
 #
-def registerUser(mongoClient, user):
-    #user is a dictionary ex: {'username': Tenzin, 'password' : MyCoolPassword}
-    #TO-DO: check if username exists
+def registerUser(mongoClient, userObj):
+    userObj['password'] = hashPassword(userObj['password'])
     usernameTaken = mongoClient.user_collection.find_one(
-        {"username": user['username']})
+        {"username": userObj['username']})
     if usernameTaken:
         print("Registration Failed")
         return False  #need to add something to show user on client side that username is taken
-    mongoClient.user_collection.insert_one(user)
+    mongoClient.user_collection.insert_one(userObj)
     print("Registration Successful!")
     return True
 
 
 #
-def loginUser(mongoClient, user):
+def loginUser(mongoClient, userObj):
     #user is a dictionary ex: {'username': Tenzin, 'password' : MyCoolPassword}
-    print(user)
-    userInsideCollection = mongoClient.user_collection.find_one({
-        "username":
-        user['username'],
-        "password":
-        user['password']
-    })
-    print(userInsideCollection)
-    if userInsideCollection:
-        print("Login Successful!")
-        return True
-    print("Login Fail")
-    return False  #need to add something to show that user on client side that they cannot login (wrong username or password)
+    print(userObj)
+
+    #find user in the database with matching username
+    dbUser = mongoClient.user_collection.find_one(
+        {"username": userObj['username']})
+
+    #if user with matching username exists, check if passwords match
+    if dbUser:
+        #userObj password unhashed, dbUser password is hashed
+        if checkPassword(userObj, dbUser):
+            return dbUser
+    return False
+    #need to add something to show that user on client side that they cannot login (wrong username or password)
+
+
+def getAllUsers(mongoClient):
+    return list(mongoClient.user_collection.find())
 
 
 #

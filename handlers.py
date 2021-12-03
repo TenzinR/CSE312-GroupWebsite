@@ -42,8 +42,10 @@ def renderLoginForm():
 # Checks if login is correct or not and redirects accordingly
 def login(mongoClient):
     userObj = createUserObj(request)
-    if loginUser(mongoClient, userObj):
-        return redirect(url_for('renderHome'))
+    dbUser = loginUser(mongoClient, userObj)
+    if dbUser:
+        print(str(dbUser["_id"]))
+        return redirect(url_for('renderHome')), str(dbUser['_id'])
     return renderLoginForm()
 
 
@@ -55,6 +57,8 @@ def renderRegisterForm():
 # Registers user, saving their data in mongoDB
 def register(mongoClient):
     userObj = createUserObj(request)
+
+    #send user to DB
     if registerUser(mongoClient, userObj):
         return redirect(url_for('renderHome'))
     return redirect(url_for('routeRegister'))

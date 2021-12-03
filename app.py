@@ -1,8 +1,10 @@
 from flask import Flask, request
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
+from pymongo.common import validate
 from handlers import *
-from mongoDB import Client
+from mongoDB import Client, validateToken
+import bcrypt
 
 # from markupsafe import escape
 
@@ -22,7 +24,16 @@ def renderHome():
 def routeLogin():
     if request.method == 'GET':
         return renderLoginForm()
-    return login(mongoClient)
+
+    #login returns 2 things: render_template result, and userID
+    [resp, userID] = login(mongoClient)
+
+    # take render_template result and wrap it with make_response
+    resp = make_response(resp)
+    salt = bcrypt.gensalt()
+    token = bcrypt.hashpw(userID.encode(), salt)
+    resp.set_cookie("token", token, 3600, httponly=True)
+    return resp
 
 
 # register route
@@ -36,8 +47,21 @@ def routeRegister():
 # create post
 @app.route('/posts', methods=['GET', 'POST'])
 def routePosts():
+    print(13)
     if request.method == 'GET':
-        return renderPostForm()
+        print(request.cookies)
+        token = ""
+        if "token" in request.cookies:
+            token = request.cookies['token']
+        print(token)
+        if token:  # if there is a login cookie
+            #check if token is valid
+            if validateToken(mongoClient, token):
+                print("logged in!")
+                return renderPostForm()
+        print(0)
+        return redirect(url_for('routeLogin'))  #redirect to login page
+    print(1)
     return createPost(mongoClient)
 
 
@@ -71,21 +95,6 @@ def chatList():
 def renderChat(chatId):
     return getChat(chatId)
 
-
-"""# create cookies
-@app.route('/setcookie', methods=['GET', 'POST'])
-def setcookie():
-    if request.method == 'POST':
-        user = request.form['cookie']
-        resp = make_response(render_template('index.html'))
-        resp.set_cookie('userCookie', user)
-    return resp
-
-
-@app.route('/getcookie')
-def getcookie():
-    name = request.cookies.get('userCookie')
-    return '<h1>welcome ' + name + '</h1>'"""
 
 # GET, route to list chats - chats/all
 # GET, route to render form to create a new chat - /chats
