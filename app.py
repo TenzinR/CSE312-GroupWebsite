@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask import abort, redirect, url_for
-from flask import render_template
+from flask import render_template, make_response
 from handlers import *
 from mongoDB import Client
 
@@ -41,16 +41,15 @@ def routePosts():
     return createPost(mongoClient)
 
 
+@app.route('/posts/all')
+def postList():
+    return getAllPosts(mongoClient)
+
+
 # go to specific post
 @app.route('/posts/<string:postID>')
 def renderPost(postID):
     return getPost(mongoClient, postID)
-
-
-# all chats route
-@app.route('/chats/all')
-def chatList():
-    return render_template('chatIndex.html')
 
 
 # create chat route
@@ -61,11 +60,32 @@ def routeChats():
     return createChat()
 
 
+# all chats route
+@app.route('/chats/all')
+def chatList():
+    return render_template('chatIndex.html')
+
+
 # chosen chat route
 @app.route('/chats/<int:chatID>')
 def renderChat(chatId):
     return getChat(chatId)
 
+
+"""# create cookies
+@app.route('/setcookie', methods=['GET', 'POST'])
+def setcookie():
+    if request.method == 'POST':
+        user = request.form['cookie']
+        resp = make_response(render_template('index.html'))
+        resp.set_cookie('userCookie', user)
+    return resp
+
+
+@app.route('/getcookie')
+def getcookie():
+    name = request.cookies.get('userCookie')
+    return '<h1>welcome ' + name + '</h1>'"""
 
 # GET, route to list chats - chats/all
 # GET, route to render form to create a new chat - /chats
@@ -77,7 +97,8 @@ def renderChat(chatId):
 # TO-DO List:
 # Image upload
 # Cookies
-# Chats
+# Online Users List (websockets)
+# Chats (live DMs using websockets)
 # Comments
 # Flash
 # Security

@@ -55,3 +55,8 @@ def mongoCreatePost(mongoClient, post):
 #
 def mongoGetPost(mongoClient, postID):
     return mongoClient.post_collection.find_one({"_id": ObjectId(postID)})
+
+
+#
+def mongoGetAllPosts(mongoClient):
+    return list(mongoClient.post_collection.find())

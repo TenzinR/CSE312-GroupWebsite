@@ -9,6 +9,9 @@
   <body>
     <h1>{{data.title}}</h1>
     <h3>{{data.author}}</h3>
+    {% if data.imageUrl %}
+    <img src="{{data.imageUrl}}" alt="" width="300" height="300" />
+    {% endif %}
     <div>{{data.text}}</div>
   </body>
 </html>
