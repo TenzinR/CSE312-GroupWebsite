@@ -18,7 +18,13 @@ mongoClient = Client()
 # home route
 @app.route('/')
 def renderHome():
-    return render_template('index.html')
+    token = getToken(request)
+    data = ''
+    if token:
+        user = validateToken(mongoClient, token)
+        if user:
+            data = user
+    return render_template('index.html', data=data)
 
 
 # log in route
@@ -37,7 +43,7 @@ def routeLogin():
         token = bcrypt.hashpw(userID.encode(), salt)
 
         #add cookie to response
-        resp.set_cookie("token", token, 3600, httponly=True)
+        resp.set_cookie(key="token", value=token, max_age=3600, httponly=True)
 
     #use resp instead of render_template when setting cookies
     return resp
@@ -49,6 +55,13 @@ def routeRegister():
     if request.method == 'GET':
         return renderRegisterForm()
     return register(mongoClient)
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    resp = make_response(redirect(url_for('renderHome')))
+    resp.set_cookie(key='token', value='', max_age=0)  #get rid of cookie
+    return resp
 
 
 # create post

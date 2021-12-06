@@ -7,12 +7,17 @@
     <title>Home Page!</title>
   </head>
   <body>
-    <h1></h1>
+    {% if data: %}
+    <h1>Welcome, {{data.username}}</h1>
+    {% endif %}
     <form action="/register" method="GET">
       <button>Register</button>
     </form>
     <form action="/login" method="GET">
       <button>Login</button>
+    </form>
+    <form action="/logout" method="POST">
+      <button>Logout</button>
     </form>
     <form action="/posts" method="GET">
       <button>Create Post!</button>

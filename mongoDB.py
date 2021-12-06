@@ -29,7 +29,7 @@ def validateToken(mongoClient, token):
     userList = getAllUsers(mongoClient)
     for user in userList:
         if bcrypt.checkpw(str(user['_id']).encode(), token.encode()):
-            return True
+            return user
     return False
 
 
