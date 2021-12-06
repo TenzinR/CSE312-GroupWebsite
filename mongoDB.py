@@ -12,6 +12,7 @@ class Client:
         self.user_collection = self.db.user_collection
         self.chat_collection = self.db.chat_collection
         self.post_collection = self.db.post_collection
+        self.online_users = self.db.online_users
 
 
 def hashPassword(password):
@@ -31,6 +32,17 @@ def validateToken(mongoClient, token):
         if bcrypt.checkpw(str(user['_id']).encode(), token.encode()):
             return user
     return False
+
+
+def getOnlineUsers(mongoClient):
+    return mongoClient.online_users.find()
+
+
+def addOnlineUser(mongoClient, userObj):
+    try:
+        return mongoClient.online_users.insert_one(userObj)
+    except:
+        return False
 
 
 #

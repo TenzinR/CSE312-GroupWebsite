@@ -1,11 +1,11 @@
 from flask import Flask, request
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
-from mongoDB import Client, validateToken
+from mongoDB import Client, addOnlineUser, getOnlineUsers, validateToken
 import bcrypt
 
 # from markupsafe import escape
@@ -26,8 +26,10 @@ def renderHome():
         user = validateToken(mongoClient, token)
         if user:
             data = user
+            addOnlineUser(mongoClient, user)
     else:
         return render_template('landing.html')
+
     return render_template('index.html', data=data)
 
 
@@ -119,9 +121,17 @@ def renderChat(chatId):
     return getChat(chatId)
 
 
-@socketio.on('message')
-def handle_message(data):
-    print('received message: ' + data)
+@socketio.on('connect')
+def handleConnect():
+    token = getToken(request)
+    if token:
+        user = validateToken(mongoClient, token)
+        if user:
+            onlineUsers = list(getOnlineUsers(mongoClient))
+            if user not in onlineUsers:
+                addOnlineUser(mongoClient, user)
+            for u in onlineUsers:
+                emit('addUserToList', u['username'])
 
 
 if __name__ == '__main__':
@@ -131,7 +141,6 @@ if __name__ == '__main__':
 # GET, route to render form to create a new chat - /chats
 # POST, route to use form data to create new chat - /chats
 # GET, route to go to specific chat using id - /chats/<ID>
-#
 #
 
 # TO-DO List:

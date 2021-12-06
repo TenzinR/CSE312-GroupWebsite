@@ -31,9 +31,9 @@ def renderLoginForm():
 def login(mongoClient):
     userObj = createUserObj(request)
     dbUser = loginUser(mongoClient, userObj)
-    print("dbUser: ", dbUser)
+    # print("dbUser: ", dbUser)
     if dbUser:  #if user was found in database, log them in
-        print(str(dbUser["_id"]))
+        # print(str(dbUser["_id"]))
         return redirect(url_for('renderHome')), str(dbUser['_id'])
     return renderLoginForm(), ''  #user not found, so render login form again
 

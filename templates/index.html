@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
     <title>Home Page!</title>
   </head>
   <body>
     {% if data: %}
-    <h1>Welcome, {{data.username}}</h1>
+    <h1>Welcome, <span id="username">{{data.username}}</span></h1>
     {% endif %}
     <form action="/register" method="GET">
       <button>Register</button>
@@ -22,10 +23,33 @@
     <form action="/posts" method="GET">
       <button>Create Post!</button>
     </form>
-    <!-- list of subreddits -->
-    <!-- top posts of each subreddit -->
-    <!-- sign in -->
-    <!-- chat -->
-    <!-- back to top -->
+    <div>
+      <h2>Online Users</h2>
+      <ul id="userList"></ul>
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" charset="utf-8">
+      var socket = io();
+      socket.on("addUserToList", (username) => {
+        li = document.createElement("li");
+        li.innerText = username;
+        userUl = document.getElementById("userList");
+        arr = Array.from(userUl.children);
+        for (child of arr) {
+          if (child.innerText != username && child.innerText != undefined) {
+            userUl.appendChild(li);
+          }
+        }
+        if (arr.length == 0) {
+          userUl.appendChild(li);
+        }
+        console.log(username);
+      });
+    </script>
   </body>
 </html>
