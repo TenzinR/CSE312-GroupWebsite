@@ -3,6 +3,8 @@ from flask import render_template
 from flask import abort, redirect, url_for
 from mongoDB import mongoGetPost, registerUser, loginUser, mongoCreatePost, mongoGetAllPosts
 
+# Bug - when logging in with info not in db, get ValueError
+
 
 def getToken(request):
     token = ""
@@ -29,10 +31,11 @@ def renderLoginForm():
 def login(mongoClient):
     userObj = createUserObj(request)
     dbUser = loginUser(mongoClient, userObj)
-    if dbUser:
+    print("dbUser: ", dbUser)
+    if dbUser:  #if user was found in database, log them in
         print(str(dbUser["_id"]))
         return redirect(url_for('renderHome')), str(dbUser['_id'])
-    return renderLoginForm()
+    return renderLoginForm(), ''  #user not found, so render login form again
 
 
 # Renders the registerForm page

@@ -30,11 +30,16 @@ def routeLogin():
     #login returns 2 things: render_template result, and userID
     [resp, userID] = login(mongoClient)
 
-    # take render_template result and wrap it with make_response
-    resp = make_response(resp)
-    salt = bcrypt.gensalt()
-    token = bcrypt.hashpw(userID.encode(), salt)
-    resp.set_cookie("token", token, 3600, httponly=True)
+    if userID:  #if the login credentials were valid
+        # take render_template result and wrap it with make_response
+        resp = make_response(resp)
+        salt = bcrypt.gensalt()
+        token = bcrypt.hashpw(userID.encode(), salt)
+
+        #add cookie to response
+        resp.set_cookie("token", token, 3600, httponly=True)
+
+    #use resp instead of render_template when setting cookies
     return resp
 
 
