@@ -10,6 +10,7 @@
     <div>
       {% if not data %}
       <h1>No posts yet!</h1>
+      <a href="/posts"><button>Create Post</button></a>
       {% else %} {% for post in data: %}
       <div>
         <h2>{{post.title}}</h2>

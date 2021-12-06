@@ -1,7 +1,7 @@
 from flask import Flask, request
+from flask_socketio import SocketIO
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
-from pymongo.common import validate
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
@@ -11,6 +11,8 @@ import bcrypt
 # from markupsafe import escape
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 mongoClient = Client()
 
@@ -24,6 +26,8 @@ def renderHome():
         user = validateToken(mongoClient, token)
         if user:
             data = user
+    else:
+        return render_template('landing.html')
     return render_template('index.html', data=data)
 
 
@@ -38,6 +42,7 @@ def routeLogin():
 
     if userID:  #if the login credentials were valid
         # take render_template result and wrap it with make_response
+
         resp = make_response(resp)
         salt = bcrypt.gensalt()
         token = bcrypt.hashpw(userID.encode(), salt)
@@ -67,10 +72,8 @@ def logout():
 # create post
 @app.route('/posts', methods=['GET', 'POST'])
 def routePosts():
-
-    token = getToken(
-        request)  #we need to get a token to see if the user is logged in
-
+    #we need to get a token to see if the user is logged in
+    token = getToken(request)
     if token:  # if there is a login cookie, i.e the user is logged in
         #check if token is valid
         if validateToken(mongoClient, token):
@@ -115,6 +118,14 @@ def chatList():
 def renderChat(chatId):
     return getChat(chatId)
 
+
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + data)
+
+
+if __name__ == '__main__':
+    socketio.run(app)
 
 # GET, route to list chats - chats/all
 # GET, route to render form to create a new chat - /chats

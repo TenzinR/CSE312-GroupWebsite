@@ -1,6 +1,6 @@
-from flask import Flask, request
+from flask import request
 from flask import render_template
-from flask import abort, redirect, url_for
+from flask import redirect, url_for
 from mongoDB import mongoGetPost, mongoCreatePost, mongoGetAllPosts
 
 import os

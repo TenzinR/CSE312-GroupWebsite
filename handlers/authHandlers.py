@@ -1,7 +1,7 @@
-from flask import Flask, request
+from flask import request
 from flask import render_template
-from flask import abort, redirect, url_for
-from mongoDB import mongoGetPost, registerUser, loginUser, mongoCreatePost, mongoGetAllPosts
+from flask import redirect, url_for
+from mongoDB import registerUser, loginUser
 
 # Bug - when logging in with info not in db, get ValueError
 
