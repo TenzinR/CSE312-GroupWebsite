@@ -2,7 +2,9 @@ from flask import Flask, request
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
 from pymongo.common import validate
-from handlers import *
+from handlers.authHandlers import *
+from handlers.chatHandlers import *
+from handlers.postHandlers import *
 from mongoDB import Client, validateToken
 import bcrypt
 
@@ -47,22 +49,22 @@ def routeRegister():
 # create post
 @app.route('/posts', methods=['GET', 'POST'])
 def routePosts():
-    print(13)
-    if request.method == 'GET':
-        print(request.cookies)
-        token = ""
-        if "token" in request.cookies:
-            token = request.cookies['token']
-        print(token)
-        if token:  # if there is a login cookie
-            #check if token is valid
-            if validateToken(mongoClient, token):
-                print("logged in!")
-                return renderPostForm()
-        print(0)
-        return redirect(url_for('routeLogin'))  #redirect to login page
-    print(1)
-    return createPost(mongoClient)
+
+    token = getToken(
+        request)  #we need to get a token to see if the user is logged in
+
+    if token:  # if there is a login cookie, i.e the user is logged in
+        #check if token is valid
+        if validateToken(mongoClient, token):
+            print("logged in!")
+            if request.method == 'GET':
+                return renderPostForm(
+                )  #if GET request, need to display form to create a new post
+            return createPost(
+                mongoClient)  # if POST request, create post in database
+
+    return redirect(url_for(
+        'routeLogin'))  # if token was not found/valid, redirect to login page
 
 
 @app.route('/posts/all')
@@ -104,10 +106,9 @@ def renderChat(chatId):
 #
 
 # TO-DO List:
-# Image upload
-# Cookies
+# Cookies -
 # Online Users List (websockets)
 # Chats (live DMs using websockets)
-# Comments
-# Flash
+# Comments - maybe not, might just add upvotes/downvotes
+# Flash - messages popping up showing login successful, password requirements not met, etc.
 # Security
