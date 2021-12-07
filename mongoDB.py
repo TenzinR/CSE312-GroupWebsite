@@ -5,8 +5,8 @@ import bcrypt
 
 class Client:
     def __init__(self):
-
-        self.client = MongoClient("localhost", 27017)
+        self.host = 'mongo'  #mongo for docker, localhost otherwise
+        self.client = MongoClient(self.host, 27017)
         print("MONGO CONNECTION OPEN!")
         self.db = self.client.reddit_clone
         self.user_collection = self.db.user_collection

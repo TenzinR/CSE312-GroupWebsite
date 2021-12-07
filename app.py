@@ -135,7 +135,7 @@ def handleConnect():
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
 
 # GET, route to list chats - chats/all
 # GET, route to render form to create a new chat - /chats
