@@ -5,7 +5,7 @@ from flask import render_template, make_response
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
-from mongoDB import Client, addOnlineUser, getOnlineUsers, validateToken
+from mongoDB import *
 import bcrypt
 
 # from markupsafe import escape
@@ -66,6 +66,9 @@ def routeRegister():
 
 @app.route('/logout', methods=['POST'])
 def logout():
+    user = validateToken(mongoClient, getToken(request))
+    removeOnlineUser(mongoClient, user)
+    socketio.emit('removeUserFromList', user['username'], broadcast=True)
     resp = make_response(redirect(url_for('renderHome')))
     resp.set_cookie(key='token', value='', max_age=0)  #get rid of cookie
     return resp
@@ -130,8 +133,28 @@ def handleConnect():
             onlineUsers = list(getOnlineUsers(mongoClient))
             if user not in onlineUsers:
                 addOnlineUser(mongoClient, user)
+            onlyUsernames = []
             for u in onlineUsers:
-                emit('addUserToList', u['username'])
+                onlyUsernames.append(u['username'])
+            emit('addUserToList', {'onlyUsernames': onlyUsernames},
+                 broadcast=True)
+
+
+# @socketio.on('windowClose')
+# def handleWindowClose():
+#     # print("a window was closed")
+#     user = validateToken(mongoClient, getToken(request))
+#     print(user['username'], ' closed their window')
+#     removeOnlineUser(mongoClient, user)
+#     emit('removeUserFromList', user['username'], broadcast=True)
+
+
+@socketio.on('disconnect')
+def handleDisconnect():
+    user = validateToken(mongoClient, getToken(request))
+    print(user['username'], ' closed their window')
+    removeOnlineUser(mongoClient, user)
+    emit('removeUserFromList', user['username'], broadcast=True)
 
 
 if __name__ == '__main__':

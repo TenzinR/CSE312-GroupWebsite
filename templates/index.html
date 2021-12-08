@@ -18,7 +18,7 @@
       <button>Login</button>
     </form>
     <form action="/logout" method="POST">
-      <button>Logout</button>
+      <button id="logout">Logout</button>
     </form>
     <form action="/posts" method="GET">
       <button>Create Post!</button>
@@ -33,23 +33,6 @@
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
       crossorigin="anonymous"
     ></script>
-    <script type="text/javascript" charset="utf-8">
-      var socket = io();
-      socket.on("addUserToList", (username) => {
-        li = document.createElement("li");
-        li.innerText = username;
-        userUl = document.getElementById("userList");
-        arr = Array.from(userUl.children);
-        for (child of arr) {
-          if (child.innerText != username && child.innerText != undefined) {
-            userUl.appendChild(li);
-          }
-        }
-        if (arr.length == 0) {
-          userUl.appendChild(li);
-        }
-        console.log(username);
-      });
-    </script>
+    <script type="text/javascript" charset="utf-8" src="/static/socketFunctions.js"></script>
   </body>
 </html>

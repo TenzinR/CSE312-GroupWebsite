@@ -5,7 +5,7 @@ import bcrypt
 
 class Client:
     def __init__(self):
-        self.host = 'mongo'  #mongo for docker, localhost otherwise
+        self.host = 'localhost'  #mongo for docker, localhost otherwise
         self.client = MongoClient(self.host, 27017)
         print("MONGO CONNECTION OPEN!")
         self.db = self.client.reddit_clone
@@ -41,6 +41,13 @@ def getOnlineUsers(mongoClient):
 def addOnlineUser(mongoClient, userObj):
     try:
         return mongoClient.online_users.insert_one(userObj)
+    except:
+        return False
+
+
+def removeOnlineUser(mongoClient, userObj):
+    try:
+        return mongoClient.online_users.delete_one(userObj)
     except:
         return False
 
