@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_socketio import SocketIO, send, emit
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
+from pymongo.common import VALIDATORS
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
@@ -36,16 +37,17 @@ def renderHome():
 # log in route
 @app.route('/login', methods=['GET', 'POST'])
 def routeLogin():
+    resp = make_response(renderLoginForm())
     if request.method == 'GET':
-        return renderLoginForm()
+        return resp
 
-    #login returns 2 things: render_template result, and userID
-    [resp, userID] = login(mongoClient)
+    #login returns userID
+    userID = login(mongoClient)
 
     if userID:  #if the login credentials were valid
-        # take render_template result and wrap it with make_response
+        #respond with the user's account page
 
-        resp = make_response(resp)
+        resp = redirect(url_for('routeUser', userID=userID))
         salt = bcrypt.gensalt()
         token = bcrypt.hashpw(userID.encode(), salt)
 
@@ -54,6 +56,22 @@ def routeLogin():
 
     #use resp instead of render_template when setting cookies
     return resp
+
+
+@app.route('/user/<string:userID>')
+def routeUser(userID):
+    username = validateToken(mongoClient, getToken(request))['username']
+    userPosts = mongoGetUserPosts(mongoClient, userID)
+    dark = False
+    darkmodeToken = getDarkmodeToken(request)
+    if validateDarkmode(darkmodeToken):
+        dark = True
+    return render_template('accountTemplate.html',
+                           data={
+                               'userPosts': userPosts,
+                               'dark': dark,
+                               'username': username
+                           })
 
 
 # register route
@@ -81,13 +99,13 @@ def routePosts():
     token = getToken(request)
     if token:  # if there is a login cookie, i.e the user is logged in
         #check if token is valid
-        if validateToken(mongoClient, token):
-            print("logged in!")
+        user = validateToken(mongoClient, token)
+        if user:
             if request.method == 'GET':
                 return renderPostForm(
                 )  #if GET request, need to display form to create a new post
-            return createPost(
-                mongoClient)  # if POST request, create post in database
+            return createPost(mongoClient,
+                              user)  # if POST request, create post in database
 
     return redirect(url_for(
         'routeLogin'))  # if token was not found/valid, redirect to login page
@@ -124,6 +142,24 @@ def renderChat(chatId):
     return getChat(chatId)
 
 
+@app.route('/darkmode')
+def routeDarkmode():
+    token = getToken(request)
+    user = validateToken(mongoClient, token)
+    resp = redirect(url_for('routeUser', userID=str(user['_id'])))
+    darkmodeToken = getDarkmodeToken(request)
+    if not validateDarkmode(darkmodeToken):
+        salt = bcrypt.gensalt()
+        darkmodeToken = bcrypt.hashpw('true'.encode(), salt)
+        resp.set_cookie(key="darkmode",
+                        value=darkmodeToken,
+                        max_age=3600,
+                        httponly=True)
+    else:
+        resp.set_cookie(key='darkmode', value='', max_age=0, httponly=True)
+    return resp
+
+
 @socketio.on('connect')
 def handleConnect():
     token = getToken(request)
@@ -152,7 +188,6 @@ def handleConnect():
 @socketio.on('disconnect')
 def handleDisconnect():
     user = validateToken(mongoClient, getToken(request))
-    print(user['username'], ' closed their window')
     removeOnlineUser(mongoClient, user)
     emit('removeUserFromList', user['username'], broadcast=True)
 
@@ -167,9 +202,6 @@ if __name__ == '__main__':
 #
 
 # TO-DO List:
-# Cookies -
-# Online Users List (websockets)
-# Chats (live DMs using websockets)
-# Comments - maybe not, might just add upvotes/downvotes
-# Flash - messages popping up showing login successful, password requirements not met, etc.
-# Security
+# DM's with notifications
+# Setting a User can change
+# interactin via websockets (not text)

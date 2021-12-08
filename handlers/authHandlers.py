@@ -2,16 +2,29 @@ from flask import request
 from flask import render_template
 from flask import redirect, url_for
 from mongoDB import registerUser, loginUser
+import bcrypt
 
 # Bug - when logging in with info not in db, get ValueError
 
 
 def getToken(request):
-    token = ""
     if "token" in request.cookies:
-        token = request.cookies[
+        return request.cookies[
             'token']  #if a user is logged in, there will be a token
-    return token
+    return ""
+
+
+def getDarkmodeToken(request):
+    if 'darkmode' in request.cookies:
+        return request.cookies['darkmode']
+    return 'false'
+
+
+def validateDarkmode(darkmodeToken):
+    try:
+        return bcrypt.checkpw('true'.encode(), darkmodeToken.encode())
+    except:
+        return False
 
 
 # Create an object that holds the current user's username and password
@@ -34,8 +47,8 @@ def login(mongoClient):
     # print("dbUser: ", dbUser)
     if dbUser:  #if user was found in database, log them in
         # print(str(dbUser["_id"]))
-        return redirect(url_for('renderHome')), str(dbUser['_id'])
-    return renderLoginForm(), ''  #user not found, so render login form again
+        return str(dbUser['_id'])
+    return ''  #user not found, so render login form again
 
 
 # Renders the registerForm page

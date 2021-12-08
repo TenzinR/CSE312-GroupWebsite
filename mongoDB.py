@@ -7,7 +7,6 @@ class Client:
     def __init__(self):
         self.host = 'localhost'  #mongo for docker, localhost otherwise
         self.client = MongoClient(self.host, 27017)
-        print("MONGO CONNECTION OPEN!")
         self.db = self.client.reddit_clone
         self.user_collection = self.db.user_collection
         self.chat_collection = self.db.chat_collection
@@ -58,18 +57,14 @@ def registerUser(mongoClient, userObj):
     usernameTaken = mongoClient.user_collection.find_one(
         {"username": userObj['username']})
     if usernameTaken:
-        print("Registration Failed")
         return False  #need to add something to show user on client side that username is taken
     mongoClient.user_collection.insert_one(userObj)
-    print("Registration Successful!")
     return True
 
 
 #
 def loginUser(mongoClient, userObj):
     #user is a dictionary ex: {'username': Tenzin, 'password' : MyCoolPassword}
-    print(userObj)
-
     #find user in the database with matching username
     dbUser = mongoClient.user_collection.find_one(
         {"username": userObj['username']})
@@ -90,13 +85,34 @@ def getAllUsers(mongoClient):
 #
 def mongoCreatePost(mongoClient, post):
     postID = mongoClient.post_collection.insert_one(post).inserted_id
-    print("successful post", postID)
     return postID
 
 
 #
 def mongoGetPost(mongoClient, postID):
     return mongoClient.post_collection.find_one({"_id": ObjectId(postID)})
+
+
+def mongoAddPostToUser(mongoClient, postID, authorID):
+    author = mongoClient.user_collection.find_one_and_update(
+        {"_id": ObjectId(authorID)}, {'$push': {
+            'postList': postID
+        }})
+    return
+
+
+def mongoGetUserPosts(mongoClient, userID):
+    try:
+        postIDs = mongoClient.user_collection.find_one(
+            {"_id": ObjectId(userID)})['postList']
+    except:
+        postIDs = []
+    postInfoList = []
+    for id in postIDs:
+        post = mongoGetPost(mongoClient, id)
+        post['_id'] = str(post['_id'])
+        postInfoList.append(post)
+    return postInfoList
 
 
 #

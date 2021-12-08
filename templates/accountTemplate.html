@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>{{data['username']}}'s Page!</title>
+  </head>
+  {% if data['dark'] %} <body class="dark"> {% else %}
+  <body>
+    {% endif %} 
+    <h1>{{data['username']}}'s Profile</h1>
+    <h2>Posts:</h2>
+    {% if not data['userPosts'] %}
+    <h2>No posts yet 😭</h2>
+    {% endif %}
+    {% for post in data['userPosts']%}
+    <ul>
+      <li>
+        <h3>{{post.title}}</h3>
+        {% if post.imageUrl %}
+        <img src="{{post.imageUrl}}" alt="" width="300" height="300" />
+        {% endif %}
+        <div>{{post.text}}</div>
+      </li>
+    </ul>
+    {% endfor %}
+    <a href="/darkmode"><button>Darkmode</button></a>
+    <a href="/"><button>Home</button></a>
+  </body>
+</html>
