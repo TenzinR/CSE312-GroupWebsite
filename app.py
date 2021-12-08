@@ -2,7 +2,6 @@ from flask import Flask, request
 from flask_socketio import SocketIO, send, emit
 from flask import abort, redirect, url_for
 from flask import render_template, make_response
-from pymongo.common import VALIDATORS
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
@@ -202,6 +201,7 @@ if __name__ == '__main__':
 #
 
 # TO-DO List:
+# Fix darkmode (database instead of just cookie)
+# Darkmode across every page
 # DM's with notifications
-# Setting a User can change
-# interactin via websockets (not text)
+# interaction via websockets (not text)
