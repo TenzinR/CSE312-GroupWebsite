@@ -12,25 +12,33 @@ import secrets
 # from markupsafe import escape
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = secrets.token_hex(16).encode()
 socketio = SocketIO(app)
 
 mongoClient = Client()
 
-
 # home route
+"""renderHome Function Summary:
+    This functions purpose is to send user to either landing.html (for the user to 
+    register and login) or to the home page. Essentially remembers logins with the
+    usage of cookie tokens
+"""
+
+
 @app.route('/')
 def renderHome():
+    #sets token equal to a user id (a cookie which can contain a users id)
     token = getToken(request)
     data = ''
+    #checks if there is a token (userid) associated with the cookie
     if token:
+        #sets user equal to a user id (if it exists)
         user = validateToken(mongoClient, token)
         if user:
             data = user
             addOnlineUser(mongoClient, user)
     else:
         return render_template('landing.html')
-
     return render_template('index.html', data=data)
 
 
@@ -147,6 +155,18 @@ def routeDarkmode():
     return redirect(url_for('routeUser', userID=str(user['_id'])))
 
 
+@app.route('/socketgame')
+def routeSocketGame():
+    token = getToken(request)
+    data = ''
+    if token:
+        user = validateToken(mongoClient, token)
+        if user:
+            data = user
+            addOnlineUser(mongoClient, user)
+    return render_template('socketGame.html', data=data)
+
+
 @socketio.on('connect')
 def handleConnect():
     token = getToken(request)
@@ -179,6 +199,12 @@ def handleDisconnect():
     emit('removeUserFromList', user['username'], broadcast=True)
 
 
+@socketio.on('serverIncrement')
+def handleIncrement(currentCount):
+    newCount = int(currentCount) + 1
+    emit('clientIncrement', newCount, broadcast=True)
+
+
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8000, debug=True)
 
@@ -189,7 +215,8 @@ if __name__ == '__main__':
 #
 
 # TO-DO List:
-# Fix darkmode (database instead of just cookie)
+# Authentication for every page that needs it - before rendering socketGame, check if user logged in
+# online users
 # Darkmode across every page
 # DM's with notifications
-# interaction via websockets (not text)
+# go over/finish security

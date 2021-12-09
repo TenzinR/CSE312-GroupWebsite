@@ -2,3 +2,23 @@
   background-color: black;
   color: white;
 }
+
+#clickerBtn {
+  height: 200px;
+  line-height: 200px;
+  width: 200px;
+  font-size: 2em;
+  font-weight: bold;
+  border-radius: 50%;
+  border: solid black;
+  background-color: brown;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-duration: 500ms;
+}
+
+#clickerBtn:hover {
+  background-color: green;
+}

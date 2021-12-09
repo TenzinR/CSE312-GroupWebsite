@@ -8,9 +8,12 @@ class Client:
         self.host = 'localhost'  #mongo for docker, localhost otherwise
         self.client = MongoClient(self.host, 27017)
         self.db = self.client.reddit_clone
+        #user collection contains userid, username, dark mode toggle and password
         self.user_collection = self.db.user_collection
         self.chat_collection = self.db.chat_collection
+        #post collection contains postid, userid, username, posts, title, caption and image
         self.post_collection = self.db.post_collection
+        #online_users contains all users currently on the websocketpage
         self.online_users = self.db.online_users
 
 

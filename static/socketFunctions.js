@@ -1,30 +1,16 @@
 var socket = io();
 
-socket.on("addUserToList", (msg) => {
-  addOnlineUsers(msg["onlyUsernames"]);
+clickerBtn = document.getElementById("clickerBtn");
+clickerBtn.addEventListener("click", () => {
+  sendCountToServer(clickerBtn.innerText);
 });
 
-// window.addEventListener("beforeunload", (e) => {
-//   e.preventDefault();
-//   socket.emit("windowClose");
-// });
-
-socket.on("removeUserFromList", (username) => {
-  //console.log("username to remove: " + username);
-  userUl = document.getElementById("userList");
-  arr = Array.from(userUl.children);
-  if (arr.length > 0) {
-    indexToRemove = -1;
-    for (listUser of arr) {
-      console.log("current user: " + listUser.innerText);
-      if (listUser.innerText == username) {
-        indexToRemove = arr.indexOf(listUser);
-        console.log("index to remove: " + indexToRemove);
-      }
-    }
-    userUl.removeChild(arr[indexToRemove]);
+const sendCountToServer = (count) => {
+  if (count == "Click") {
+    count = 0;
   }
-});
+  socket.emit("serverIncrement", count);
+};
 
 const addOnlineUsers = (onlyUsernames) => {
   // console.log(onlyUsernames);
@@ -55,3 +41,28 @@ const addOnlineUsers = (onlyUsernames) => {
     }
   }
 };
+
+socket.on("clientIncrement", (newCount) => {
+  clickerBtn.innerText = newCount;
+});
+
+socket.on("addUserToList", (msg) => {
+  addOnlineUsers(msg["onlyUsernames"]);
+});
+
+socket.on("removeUserFromList", (username) => {
+  //console.log("username to remove: " + username);
+  userUl = document.getElementById("userList");
+  arr = Array.from(userUl.children);
+  if (arr.length > 0) {
+    indexToRemove = -1;
+    for (listUser of arr) {
+      console.log("current user: " + listUser.innerText);
+      if (listUser.innerText == username) {
+        indexToRemove = arr.indexOf(listUser);
+        console.log("index to remove: " + indexToRemove);
+      }
+    }
+    userUl.removeChild(arr[indexToRemove]);
+  }
+});
