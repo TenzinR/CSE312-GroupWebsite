@@ -4,13 +4,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles.css" />
     <title>{{data.title}}</title>
   </head>
+  {% if data['darkmode'] %} <body class="dark"> {% else %}
   <body>
-    <h1>{{data.title}} - By {{data.author}}</h1>
+    {% endif %} 
+    <h1>{{data.post.title}} - By {{data.post.author}}</h1>
     {% if data.imageUrl %}
-    <img src="{{data.imageUrl}}" alt="" width="300" height="300" />
+    <img src="{{data.post.imageUrl}}" alt="" width="300" height="300" />
     {% endif %}
-    <div>{{data.text}}</div>
+    <div>{{data.post.text}}</div>
+    <a href="/"><button>Home</button></a>
   </body>
 </html>

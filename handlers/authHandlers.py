@@ -1,7 +1,7 @@
 from flask import request
 from flask import render_template
 from flask import redirect, url_for
-from mongoDB import registerUser, loginUser
+from mongoDB import *
 import bcrypt
 
 # Bug - when logging in with info not in db, get ValueError
@@ -12,6 +12,14 @@ def getToken(request):
         return request.cookies[
             'token']  #if a user is logged in, there will be a token
     return ""
+
+
+def getUser(request, mongoClient):
+    token = getToken(request)
+    #checks if there is a token (userid) associated with the cookie
+    if token:
+        return validateToken(mongoClient, token)
+    return False
 
 
 def getDarkmodeToken(request):

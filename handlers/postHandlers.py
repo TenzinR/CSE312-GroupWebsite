@@ -1,6 +1,7 @@
 from flask import request
 from flask import render_template
 from flask import redirect, url_for
+from handlers.authHandlers import getUser
 from mongoDB import *
 
 import os
@@ -54,10 +55,24 @@ def createPost(mongoClient, user):
 
 # Use postID to retrieve data from database and uploads the postTemplate to show the posts
 def getPost(mongoClient, postID):
+    user = getUser(request, mongoClient)
     post = mongoGetPost(mongoClient, postID)
-    return render_template('postTemplate.html', data=post)
+    darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+    return render_template('postTemplate.html',
+                           data={
+                               'post': post,
+                               'darkmode': darkmode
+                           })
 
 
 def getAllPosts(mongoClient):
-    postList = mongoGetAllPosts(mongoClient)
-    return render_template('allPosts.html', data=postList)
+    user = getUser(request, mongoClient)
+    if user:
+        darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+        postList = mongoGetAllPosts(mongoClient)
+        return render_template('allPosts.html',
+                               data={
+                                   'postList': postList,
+                                   'darkmode': darkmode
+                               })
+    return redirect(url_for('renderHome'))

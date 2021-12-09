@@ -28,18 +28,18 @@ mongoClient = Client()
 @app.route('/')
 def renderHome():
     #sets token equal to a user id (a cookie which can contain a users id)
-    token = getToken(request)
-    data = ''
-    #checks if there is a token (userid) associated with the cookie
-    if token:
-        #sets user equal to a user id (if it exists)
-        user = validateToken(mongoClient, token)
-        if user:
-            data = user
-            addOnlineUser(mongoClient, user)
+    user = getUser(request, mongoClient)
+    if user:
+        addOnlineUser(mongoClient, user)
+        darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+
     else:
         return render_template('landing.html')
-    return render_template('index.html', data=data)
+    return render_template('index.html',
+                           data={
+                               'user': user,
+                               'darkmode': darkmode
+                           })
 
 
 # log in route
@@ -68,15 +68,18 @@ def routeLogin():
 
 @app.route('/user/<string:userID>')
 def routeUser(userID):
-    username = validateToken(mongoClient, getToken(request))['username']
-    userPosts = mongoGetUserPosts(mongoClient, userID)
-    darkmode = getDarkmodeStatus(mongoClient, userID)
-    return render_template('accountTemplate.html',
-                           data={
-                               'userPosts': userPosts,
-                               'darkmode': darkmode,
-                               'username': username
-                           })
+    user = getUser(request, mongoClient)
+    username = user['username']
+    if userID == str(user['_id']):
+        userPosts = mongoGetUserPosts(mongoClient, userID)
+        darkmode = getDarkmodeStatus(mongoClient, userID)
+        return render_template('accountTemplate.html',
+                               data={
+                                   'userPosts': userPosts,
+                                   'darkmode': darkmode,
+                                   'username': username
+                               })
+    return redirect(url_for('renderHome'))
 
 
 # register route
@@ -89,7 +92,7 @@ def routeRegister():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    user = validateToken(mongoClient, getToken(request))
+    user = getUser(request, mongoClient)
     removeOnlineUser(mongoClient, user)
     socketio.emit('removeUserFromList', user['username'], broadcast=True)
     resp = make_response(redirect(url_for('renderHome')))
@@ -101,16 +104,13 @@ def logout():
 @app.route('/posts', methods=['GET', 'POST'])
 def routePosts():
     #we need to get a token to see if the user is logged in
-    token = getToken(request)
-    if token:  # if there is a login cookie, i.e the user is logged in
-        #check if token is valid
-        user = validateToken(mongoClient, token)
-        if user:
-            if request.method == 'GET':
-                return renderPostForm(
-                )  #if GET request, need to display form to create a new post
-            return createPost(mongoClient,
-                              user)  # if POST request, create post in database
+    user = getUser(request, mongoClient)
+    if user:
+        if request.method == 'GET':
+            return renderPostForm(
+            )  #if GET request, need to display form to create a new post
+        return createPost(mongoClient,
+                          user)  # if POST request, create post in database
 
     return redirect(url_for(
         'routeLogin'))  # if token was not found/valid, redirect to login page
@@ -157,30 +157,29 @@ def routeDarkmode():
 
 @app.route('/socketgame')
 def routeSocketGame():
-    token = getToken(request)
-    data = ''
-    if token:
-        user = validateToken(mongoClient, token)
-        if user:
-            data = user
-            addOnlineUser(mongoClient, user)
-    return render_template('socketGame.html', data=data)
+    user = getUser(request, mongoClient)
+    if user:
+        darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+        addOnlineUser(mongoClient, user)
+        return render_template('socketGame.html',
+                               data={
+                                   'user': user,
+                                   'darkmode': darkmode
+                               })
+    return redirect(url_for('routeLogin'))
 
 
 @socketio.on('connect')
 def handleConnect():
-    token = getToken(request)
-    if token:
-        user = validateToken(mongoClient, token)
-        if user:
-            onlineUsers = list(getOnlineUsers(mongoClient))
-            if user not in onlineUsers:
-                addOnlineUser(mongoClient, user)
-            onlyUsernames = []
-            for u in onlineUsers:
-                onlyUsernames.append(u['username'])
-            emit('addUserToList', {'onlyUsernames': onlyUsernames},
-                 broadcast=True)
+    user = getUser(request, mongoClient)
+    if user:
+        onlineUsers = list(getOnlineUsers(mongoClient))
+        if user not in onlineUsers:
+            addOnlineUser(mongoClient, user)
+        onlyUsernames = []
+        for u in onlineUsers:
+            onlyUsernames.append(u['username'])
+        emit('addUserToList', {'onlyUsernames': onlyUsernames}, broadcast=True)
 
 
 # @socketio.on('windowClose')
@@ -216,7 +215,6 @@ if __name__ == '__main__':
 
 # TO-DO List:
 # Authentication for every page that needs it - before rendering socketGame, check if user logged in
-# online users
 # Darkmode across every page
 # DM's with notifications
 # go over/finish security

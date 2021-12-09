@@ -4,14 +4,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles.css">
     <title>All</title>
   </head>
+  </head>
+  {% if data['darkmode'] %} <body class="dark"> {% else %}
   <body>
+    {% endif %} 
     <div>
-      {% if not data %}
+      {% if not data.postList %}
       <h1>No posts yet!</h1>
       <a href="/posts"><button>Create Post</button></a>
-      {% else %} {% for post in data: %}
+      {% else %} {% for post in data.postList: %}
       <div>
         <h2>{{post.title}} - By {{post.author}}</h2>
 
@@ -21,5 +25,6 @@
       </div>
       {% endfor %} {% endif %}
     </div>
+    <a href="/"><button>Home</button></a>
   </body>
 </html>
