@@ -33,6 +33,29 @@ def validateToken(mongoClient, token):
     return False
 
 
+def toggleDarkmode(mongoClient, userID):
+    user = mongoClient.user_collection.find_one({"_id": ObjectId(userID)})
+    if "darkmode" in user:
+        mongoClient.user_collection.find_one_and_update(
+            {"_id": ObjectId(userID)},
+            {'$set': {
+                'darkmode': not user["darkmode"]
+            }})
+        return not user["darkmode"]
+    mongoClient.user_collection.find_one_and_update(
+        {"_id": ObjectId(userID)}, {'$set': {
+            'darkmode': True
+        }})
+    return True
+
+
+def getDarkmodeStatus(mongoClient, userID):
+    user = mongoClient.user_collection.find_one({'_id': ObjectId(userID)})
+    if 'darkmode' in user:
+        return user['darkmode']
+    return False
+
+
 def getOnlineUsers(mongoClient):
     return mongoClient.online_users.find()
 

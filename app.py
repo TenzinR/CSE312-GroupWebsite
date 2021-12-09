@@ -7,6 +7,7 @@ from handlers.chatHandlers import *
 from handlers.postHandlers import *
 from mongoDB import *
 import bcrypt
+import secrets
 
 # from markupsafe import escape
 
@@ -61,14 +62,11 @@ def routeLogin():
 def routeUser(userID):
     username = validateToken(mongoClient, getToken(request))['username']
     userPosts = mongoGetUserPosts(mongoClient, userID)
-    dark = False
-    darkmodeToken = getDarkmodeToken(request)
-    if validateDarkmode(darkmodeToken):
-        dark = True
+    darkmode = getDarkmodeStatus(mongoClient, userID)
     return render_template('accountTemplate.html',
                            data={
                                'userPosts': userPosts,
-                               'dark': dark,
+                               'darkmode': darkmode,
                                'username': username
                            })
 
@@ -145,18 +143,8 @@ def renderChat(chatId):
 def routeDarkmode():
     token = getToken(request)
     user = validateToken(mongoClient, token)
-    resp = redirect(url_for('routeUser', userID=str(user['_id'])))
-    darkmodeToken = getDarkmodeToken(request)
-    if not validateDarkmode(darkmodeToken):
-        salt = bcrypt.gensalt()
-        darkmodeToken = bcrypt.hashpw('true'.encode(), salt)
-        resp.set_cookie(key="darkmode",
-                        value=darkmodeToken,
-                        max_age=3600,
-                        httponly=True)
-    else:
-        resp.set_cookie(key='darkmode', value='', max_age=0, httponly=True)
-    return resp
+    toggleDarkmode(mongoClient, user['_id'])
+    return redirect(url_for('routeUser', userID=str(user['_id'])))
 
 
 @socketio.on('connect')

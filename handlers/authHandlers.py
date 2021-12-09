@@ -17,14 +17,7 @@ def getToken(request):
 def getDarkmodeToken(request):
     if 'darkmode' in request.cookies:
         return request.cookies['darkmode']
-    return 'false'
-
-
-def validateDarkmode(darkmodeToken):
-    try:
-        return bcrypt.checkpw('true'.encode(), darkmodeToken.encode())
-    except:
-        return False
+    return ''
 
 
 # Create an object that holds the current user's username and password
