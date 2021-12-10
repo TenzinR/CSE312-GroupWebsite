@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="/static/styles.css">
     <title>Create Post!</title>
   </head>
+  {% if data['darkmode'] %} <body class="dark"> {% else %}
   <body>
+    {% endif %} 
     <form action="/posts" method="POST" enctype="multipart/form-data">
       <div>
         <label for="title">Title</label>
@@ -22,5 +25,6 @@
       </div>
       <button>Publish!</button>
     </form>
+    <a href="/"><button>Home</button></a>
   </body>
 </html>

@@ -13,22 +13,17 @@
     {% endif %} 
     {% if data['user']: %}
     <h1>Welcome, <span id="username">{{data['user'].username}}</span></h1>
-    {% endif %}
-    <form action="/register" method="GET">
-      <button>Register</button>
-    </form>
-    <form action="/login" method="GET">
-      <button>Login</button>
-    </form>
+    <a href="/user/{{data['user']._id}}"><button>Profile Page</button></a>
     <form action="/logout" method="POST">
       <button id="logout">Logout</button>
     </form>
-    <form action="/posts" method="GET">
-      <button>Create Post!</button>
-    </form>
-    <a href="/user/{{data['user']._id}}"><button>Profile Page</button></a> 
-    </br>
-    <a href="/socketgame"><button>WebSocket Game!</button></a>
+    {% endif %}
     <a href="/posts/all"><button>All Posts</button></a>
+    <br>
+    <a href="/posts"><button>Create Post!</button></a>
+    <br>
+    </form> 
+    <a href="/socketgame"><button>WebSocket Game!</button></a>
+    <br>
   </body>
 </html>

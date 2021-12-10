@@ -17,7 +17,7 @@
       <a href="/posts"><button>Create Post</button></a>
       {% else %} {% for post in data.postList: %}
       <div>
-        <h2>{{post.title}} - By {{post.author}}</h2>
+        <h2><a href="/posts/{{post._id}}">{{post.title}}</a> - By {{post.author}}</h2>
 
         {% if post.imageUrl %}
         <img src="{{post.imageUrl}}" alt="" width="300" height="300" />

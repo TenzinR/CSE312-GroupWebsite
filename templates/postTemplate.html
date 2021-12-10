@@ -11,7 +11,7 @@
   <body>
     {% endif %} 
     <h1>{{data.post.title}} - By {{data.post.author}}</h1>
-    {% if data.imageUrl %}
+    {% if data.post.imageUrl %}
     <img src="{{data.post.imageUrl}}" alt="" width="300" height="300" />
     {% endif %}
     <div>{{data.post.text}}</div>

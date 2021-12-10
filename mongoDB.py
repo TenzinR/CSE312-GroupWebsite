@@ -77,13 +77,14 @@ def removeOnlineUser(mongoClient, userObj):
         return False
 
 
+def usernameTaken(mongoClient, userObj):
+    return mongoClient.user_collection.find_one(
+        {"username": userObj['username']})
+
+
 #
 def registerUser(mongoClient, userObj):
     userObj['password'] = hashPassword(userObj['password'])
-    usernameTaken = mongoClient.user_collection.find_one(
-        {"username": userObj['username']})
-    if usernameTaken:
-        return False  #need to add something to show user on client side that username is taken
     mongoClient.user_collection.insert_one(userObj)
     return True
 

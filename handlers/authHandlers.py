@@ -1,5 +1,5 @@
 from flask import request
-from flask import render_template
+from flask import render_template, flash
 from flask import redirect, url_for
 from mongoDB import *
 import bcrypt
@@ -62,6 +62,39 @@ def register(mongoClient):
     userObj = createUserObj(request)
 
     #send user to DB
-    if registerUser(mongoClient, userObj):
-        return redirect(url_for('renderHome'))
+    if not usernameTaken(mongoClient, userObj):
+        if passwordRequirements(userObj['password']):
+            registerUser(mongoClient, userObj)
+            return redirect(url_for('renderHome'))
+        print('Password does not meet requirements!')
+    else:
+        print('Username taken!')
     return redirect(url_for('routeRegister'))
+
+
+def passwordRequirements(password):
+    # print("password: ", password)
+    passwordLen = len(password)
+    lowercaseCount = 0
+    uppercaseCount = 0
+    numberCount = 0
+    specialCount = 0
+    for c in password:
+        if not c.isalnum():
+            specialCount += 1
+        if c.isupper():
+            uppercaseCount += 1
+        if c.islower():
+            lowercaseCount += 1
+        if c.isnumeric():
+            numberCount += 1
+    # print("lowercaseCount: ", lowercaseCount)
+    # print("uppercaseCount: ", uppercaseCount)
+    # print("numberCount: ", numberCount)
+    # print("specialCount: ", specialCount)
+    # print("spaceCount: ", spaceCount)
+    # print("len: ", passwordLen)
+
+    if passwordLen < 8 or lowercaseCount == 0 or uppercaseCount == 0 or numberCount == 0 or specialCount == 0:
+        return False
+    return True

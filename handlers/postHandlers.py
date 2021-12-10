@@ -20,8 +20,8 @@ def uploadImage(img):
     return result
 
 
-def renderPostForm():
-    return render_template('postForm.html')
+def renderPostForm(darkmode):
+    return render_template('postForm.html', data={'darkmode': darkmode})
 
 
 # Gets post data from request object, then saves in mongoDB. Redirects to the created post's page

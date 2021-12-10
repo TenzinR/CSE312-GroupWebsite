@@ -107,8 +107,9 @@ def routePosts():
     user = getUser(request, mongoClient)
     if user:
         if request.method == 'GET':
-            return renderPostForm(
-            )  #if GET request, need to display form to create a new post
+            #if GET request, need to display form to create a new post
+            darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+            return renderPostForm(darkmode)
         return createPost(mongoClient,
                           user)  # if POST request, create post in database
 
