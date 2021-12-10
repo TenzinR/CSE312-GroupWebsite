@@ -1,28 +1,47 @@
-Speak
+Hello World!
 Section 1 (Functionality of App)
   - User Accounts with Secure Authentication
-    - User's have to login with a password
-    - (Security Stuff)
-  - Users to see all users who are currently logged in
+    - User's have to login with an unused username and a unique password 
+      - At least 1 lowercase letter
+      - At least 1 uppercase letter
+      - At least 1 number
+      - At least 1 special character ($, %, ? , !, etc.)
+      - Hashed password
+      - MongoDB
+  - Users can see all users who are currently logged in
     - Users can see all current users on the server
-    - (need more ideas)
+      - Websockets
   - Users can send direct messages (DM) to other users with notifications when a DM is received
-    - Users can send messages to other users by clicking on available users
-    - Users can click on users through user's posts and dm user's through there
+    - Users can send messages to other users by sending forms to websocket with receiver's name and message content
+      - Websockets
   - Users can share some form of multimedia content which is stored and hosted on your server
-    - Users can post content with images/links
-    - Users can comment under posts
+    - Users can post content with:
+      - Title (text)
+      - Caption (text)
+      - Image (image)
+    - A path for all posts of all users and each post has a title that has a link that loads the full post with title, caption, and image
+      - MongoDB
+    - A path for user's profile that will consists of all their posts
+      - MongoDB
+      - Deny those who don't have access to account
   - Live interactions between users via WebSockets (Cannot be text)
-    - Users can upvote other user's posts
-    - Users can click on other people's posts to see more info on it
+    - Users have access to a websocket game, Cookie Clicker, where users are able to click on the cookie to increase its value
+      - Websockets
     
 Section 2 (To-Do List)
-  - Read Functionality and Documentation
+  - Presentation!!
 
 Section 3 (Extra Ideas)
   - Users can gain awards 
     - Award criteria undetermined
 
 Section 4 (Documentation)
-  - Flask (https://flask.palletsprojects.com/en/2.0.x/)
-  - Oauth (https://oauth.net/2/)
+  - Flask 
+    - App.route()
+    - Request()
+    - Render_template
+    - Flask Socket IO
+    - Redirect()
+    - Url_for()
+  - PyMongo
+  - Cloudinary
