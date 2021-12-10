@@ -3,6 +3,15 @@
   color: white;
 }
 
+.dark > a > button {
+  background-color: blue;
+  color: white;
+}
+
+.dark > form > button {
+  background-color: blue;
+  color: white;
+}
 #clickerBtn {
   height: 200px;
   line-height: 200px;

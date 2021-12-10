@@ -11,6 +11,13 @@
   {% if data['darkmode'] %} <body class="dark"> {% else %}
   <body>
     {% endif %} 
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
     {% if data['user']: %}
     <h1>Welcome, <span id="username">{{data['user'].username}}</span></h1>
     <a href="/user/{{data['user']._id}}"><button>Profile Page</button></a>
@@ -23,7 +30,7 @@
     <a href="/posts"><button>Create Post!</button></a>
     <br>
     </form> 
-    <a href="/socketgame"><button>WebSocket Game!</button></a>
+    <a href="/socketgame"><button class>WebSocket Game!</button></a>
     <br>
   </body>
 </html>

@@ -1,7 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template, make_response, flash
 from flask_socketio import SocketIO, emit
 from handlers.authHandlers import *
-from handlers.chatHandlers import *
 from handlers.postHandlers import *
 from mongoDB import *
 import bcrypt
@@ -68,17 +67,21 @@ def routeLogin():
 @app.route('/user/<string:userID>')
 def routeUser(userID):
     user = getUser(request, mongoClient)
-    username = user['username']
-    if userID == str(user['_id']):
-        userPosts = mongoGetUserPosts(mongoClient, userID)
-        darkmode = getDarkmodeStatus(mongoClient, userID)
-        return render_template('accountTemplate.html',
-                               data={
-                                   'userPosts': userPosts,
-                                   'darkmode': darkmode,
-                                   'username': username
-                               })
-    return redirect(url_for('renderHome'))
+    if user:
+        username = user['username']
+        if userID == str(user['_id']):
+            userPosts = mongoGetUserPosts(mongoClient, userID)
+            darkmode = getDarkmodeStatus(mongoClient, userID)
+            return render_template('accountTemplate.html',
+                                   data={
+                                       'userPosts': userPosts,
+                                       'darkmode': darkmode,
+                                       'username': username
+                                   })
+        flash("You are not authorized to view that user's page!")
+        return redirect(url_for('renderHome'))
+    flash('You are not logged in!')
+    return redirect(url_for('routeLogin'))
 
 
 # register route
@@ -125,26 +128,6 @@ def postList():
 @app.route('/posts/<string:postID>')
 def renderPost(postID):
     return getPost(mongoClient, postID)
-
-
-# create chat route
-@app.route('/chats', methods=['GET', 'POST'])
-def routeChats():
-    if request.method == 'GET':
-        return renderChatForm()
-    return createChat()
-
-
-# all chats route
-@app.route('/chats/all')
-def chatList():
-    return render_template('chatIndex.html')
-
-
-# chosen chat route
-@app.route('/chats/<int:chatID>')
-def renderChat(chatId):
-    return getChat(chatId)
 
 
 @app.route('/darkmode')
