@@ -8,6 +8,14 @@
   </head>
   <body>
     <h1>Hello! Please Register:</h1>
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
+
     <form action="/register" method="POST">
       <div>
         <label for="username">Username: </label>
@@ -16,6 +24,16 @@
       <div>
         <label for="password">Password: </label>
         <input type="password" id="password" name="password" />
+      </div>
+      <div>
+        <h3>Password Requirements:</h3>
+        <ul>
+          <li>Password length must be at least 8 characters</li>
+          <li>At least 1 lowercase letter</li>
+          <li>At least 1 uppercase letter</li>
+          <li>At least 1 number</li>
+          <li>At least 1 special character ($, %, ? , !, etc.)</li>
+        </ul>
       </div>
       <button>Submit</button>
     </form>

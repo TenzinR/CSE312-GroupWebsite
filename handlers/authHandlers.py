@@ -1,8 +1,6 @@
 from flask import request
-from flask import render_template, flash
-from flask import redirect, url_for
+from flask import redirect, url_for, flash, render_template
 from mongoDB import *
-import bcrypt
 
 # Bug - when logging in with info not in db, get ValueError
 
@@ -36,11 +34,6 @@ def createUserObj(request):
     return userObj
 
 
-# Renders loginForm page to login
-def renderLoginForm():
-    return render_template('loginForm.html')
-
-
 # Checks if login is correct or not and redirects accordingly
 def login(mongoClient):
     userObj = createUserObj(request)
@@ -66,9 +59,9 @@ def register(mongoClient):
         if passwordRequirements(userObj['password']):
             registerUser(mongoClient, userObj)
             return redirect(url_for('renderHome'))
-        print('Password does not meet requirements!')
+        flash('Password does not meet requirements!')
     else:
-        print('Username taken!')
+        flash('Username taken!')
     return redirect(url_for('routeRegister'))
 
 

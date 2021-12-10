@@ -1,7 +1,5 @@
-from flask import Flask, request
-from flask_socketio import SocketIO, send, emit
-from flask import abort, redirect, url_for
-from flask import render_template, make_response
+from flask import Flask, request, redirect, url_for, render_template, make_response, flash
+from flask_socketio import SocketIO, emit
 from handlers.authHandlers import *
 from handlers.chatHandlers import *
 from handlers.postHandlers import *
@@ -45,15 +43,15 @@ def renderHome():
 # log in route
 @app.route('/login', methods=['GET', 'POST'])
 def routeLogin():
-    resp = make_response(renderLoginForm())
     if request.method == 'GET':
-        return resp
+        return render_template('loginForm.html')
 
     #login returns userID
     userID = login(mongoClient)
 
     if userID:  #if the login credentials were valid
         #respond with the user's account page
+        #use resp instead of render_template when setting cookies
 
         resp = redirect(url_for('routeUser', userID=userID))
         salt = bcrypt.gensalt()
@@ -61,9 +59,10 @@ def routeLogin():
 
         #add cookie to response
         resp.set_cookie(key="token", value=token, max_age=3600, httponly=True)
-
-    #use resp instead of render_template when setting cookies
-    return resp
+        return resp
+    else:
+        flash('Login failed! Please review your credentials.')
+        return redirect(url_for('routeLogin'))
 
 
 @app.route('/user/<string:userID>')
