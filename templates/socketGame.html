@@ -11,11 +11,28 @@
   <body>
     {% endif %} 
     <div>
-      <h2>Online Users</h2>
+      <h1>Welcome, <span id='currentUser'>{{data['user']['username']}}</span></h1>
+      <h2>Online Users:</h2>
       <ul id="userList"></ul>
     </div>
     <button id="clickerBtn">Click</button>
-    </br>
+    <br>
+
+    <section id='messageBoard'>
+
+    </section>
+
+    <button id='messageFormButton'>Send a Message</button>
+    <form id='messageForm' action="" style="display: none;">
+      <label for="messageRecipient">Recipient's Username</label>
+      <input id='messageRecipient' type="text">
+      <br>
+      <label for="messageText">Message Text</label>
+      <input id='messageText' type="text">
+      <br>
+      <button>Send</button>
+    </form>
+    <br>
     <a href="/"><button>Home</button></a>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"

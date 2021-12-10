@@ -165,13 +165,18 @@ def handleConnect():
         emit('addUserToList', {'onlyUsernames': onlyUsernames}, broadcast=True)
 
 
-# @socketio.on('windowClose')
-# def handleWindowClose():
-#     # print("a window was closed")
-#     user = validateToken(mongoClient, getToken(request))
-#     print(user['username'], ' closed their window')
-#     removeOnlineUser(mongoClient, user)
-#     emit('removeUserFromList', user['username'], broadcast=True)
+@socketio.on('serverMessage')
+def handleMessage(messageObj):
+    print(messageObj)
+    recipientUsername = messageObj['recipientUsername']
+    senderUsername = messageObj['senderUsername']
+    messageText = messageObj['messageText']
+    emit('clientMessage', {
+        'senderUsername': senderUsername,
+        'recipientUsername': recipientUsername,
+        'messageText': messageText
+    },
+         broadcast=True)
 
 
 @socketio.on('disconnect')
