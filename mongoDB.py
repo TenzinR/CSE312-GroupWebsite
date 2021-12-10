@@ -10,7 +10,6 @@ class Client:
         self.db = self.client.reddit_clone
         #user collection contains userid, username, dark mode toggle and password
         self.user_collection = self.db.user_collection
-        self.chat_collection = self.db.chat_collection
         #post collection contains postid, userid, username, posts, title, caption and image
         self.post_collection = self.db.post_collection
         #online_users contains all users currently on the websocketpage
@@ -121,11 +120,10 @@ def mongoGetPost(mongoClient, postID):
 
 
 def mongoAddPostToUser(mongoClient, postID, authorID):
-    author = mongoClient.user_collection.find_one_and_update(
+    return mongoClient.user_collection.find_one_and_update(
         {"_id": ObjectId(authorID)}, {'$push': {
             'postList': postID
         }})
-    return
 
 
 def mongoGetUserPosts(mongoClient, userID):

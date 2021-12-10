@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template, make_response, flash
+from flask import Flask, request, redirect, url_for, render_template, flash
 from flask_socketio import SocketIO, emit
 from handlers.authHandlers import *
 from handlers.postHandlers import *
@@ -52,7 +52,7 @@ def routeLogin():
         #respond with the user's account page
         #use resp instead of render_template when setting cookies
 
-        resp = redirect(url_for('routeUser', userID=userID))
+        resp = redirect(url_for('renderHome'))
         salt = bcrypt.gensalt()
         token = bcrypt.hashpw(userID.encode(), salt)
 
@@ -97,8 +97,9 @@ def logout():
     user = getUser(request, mongoClient)
     removeOnlineUser(mongoClient, user)
     socketio.emit('removeUserFromList', user['username'], broadcast=True)
-    resp = make_response(redirect(url_for('renderHome')))
-    resp.set_cookie(key='token', value='', max_age=0)  #get rid of cookie
+    resp = redirect(url_for('renderHome'))
+    resp.set_cookie(key='token', value='', max_age=0,
+                    httponly=True)  #get rid of cookie
     return resp
 
 
@@ -181,7 +182,7 @@ def handleMessage(messageObj):
 
 @socketio.on('disconnect')
 def handleDisconnect():
-    user = validateToken(mongoClient, getToken(request))
+    user = getUser(request, mongoClient)
     removeOnlineUser(mongoClient, user)
     emit('removeUserFromList', user['username'], broadcast=True)
 
