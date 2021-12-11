@@ -1,4 +1,5 @@
 Hello World!
+Use localhost:8080
 Section 1 (Functionality of App)
   - User Accounts with Secure Authentication
     - User's have to login with an unused username and a unique password 
