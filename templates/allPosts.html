@@ -11,6 +11,13 @@
   {% if data['darkmode'] %} <body class="dark"> {% else %}
   <body>
     {% endif %} 
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
     <div>
       <h1>All Posts:</h1>
       {% if not data.postList %}

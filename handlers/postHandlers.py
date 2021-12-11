@@ -1,5 +1,5 @@
 from flask import request
-from flask import render_template
+from flask import render_template, flash
 from flask import redirect, url_for
 from handlers.authHandlers import getUser
 from mongoDB import *
@@ -56,12 +56,16 @@ def createPost(mongoClient, user):
 def getPost(mongoClient, postID):
     user = getUser(request, mongoClient)
     post = mongoGetPost(mongoClient, postID)
-    darkmode = getDarkmodeStatus(mongoClient, user['_id'])
-    return render_template('postTemplate.html',
-                           data={
-                               'post': post,
-                               'darkmode': darkmode
-                           })
+    if post:
+        darkmode = getDarkmodeStatus(mongoClient, user['_id'])
+        return render_template('postTemplate.html',
+                               data={
+                                   'post': post,
+                                   'darkmode': darkmode
+                               })
+    else:
+        flash('That post does not exist!')
+        return redirect(url_for('postList'))
 
 
 def getAllPosts(mongoClient):

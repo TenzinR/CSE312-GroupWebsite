@@ -5,7 +5,7 @@ import bcrypt
 
 class Client:
     def __init__(self):
-        self.host = 'localhost'  #mongo for docker, localhost otherwise
+        self.host = 'mongo'  #mongo for docker, localhost otherwise
         self.client = MongoClient(self.host, 27017)
         self.db = self.client.reddit_clone
         #user collection contains userid, username, dark mode toggle and password
@@ -13,6 +13,7 @@ class Client:
         #post collection contains postid, userid, username, posts, title, caption and image
         self.post_collection = self.db.post_collection
         #online_users contains all users currently on the websocketpage
+        self.db.online_users.remove()
         self.online_users = self.db.online_users
 
 
@@ -116,7 +117,10 @@ def mongoCreatePost(mongoClient, post):
 
 #
 def mongoGetPost(mongoClient, postID):
-    return mongoClient.post_collection.find_one({"_id": ObjectId(postID)})
+    try:
+        return mongoClient.post_collection.find_one({"_id": ObjectId(postID)})
+    except:
+        return False
 
 
 def mongoAddPostToUser(mongoClient, postID, authorID):
