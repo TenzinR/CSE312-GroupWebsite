@@ -8,10 +8,16 @@
   color: white;
 }
 
+.dark > button {
+  background-color: blue;
+  color: white;
+}
+
 .dark > form > button {
   background-color: blue;
   color: white;
 }
+
 #clickerBtn {
   height: 200px;
   line-height: 200px;
@@ -26,6 +32,10 @@
   cursor: pointer;
   transition-property: background-color;
   transition-duration: 500ms;
+}
+
+.dark > #clickerBtn {
+  border: solid white;
 }
 
 #clickerBtn:hover {

@@ -135,3 +135,11 @@ socket.on("removeUserFromList", (username) => {
     userUl.removeChild(arr[indexToRemove]);
   }
 });
+
+socket.on("countRequest", () => {
+  count = clickerBtn.innerText;
+  if (count == "Click") {
+    count = 0;
+  }
+  socket.emit("countResponse", count);
+});

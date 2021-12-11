@@ -6,11 +6,10 @@ from mongoDB import *
 import bcrypt
 import secrets
 
-# from markupsafe import escape
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_hex(16).encode()
 socketio = SocketIO(app)
+leastCount = 0
 
 mongoClient = Client()
 
@@ -163,6 +162,7 @@ def handleConnect():
         onlyUsernames = []
         for u in onlineUsers:
             onlyUsernames.append(u['username'])
+        emit('countRequest', broadcast=True)
         emit('addUserToList', {'onlyUsernames': onlyUsernames}, broadcast=True)
 
 
@@ -191,6 +191,17 @@ def handleDisconnect():
 def handleIncrement(currentCount):
     newCount = int(currentCount) + 1
     emit('clientIncrement', newCount, broadcast=True)
+
+
+@socketio.on('countResponse')
+def compareResponse(clientCount):
+    global leastCount
+    print('leastCount: ' + str(leastCount) + ' clientCount: ', clientCount)
+    if int(clientCount) > leastCount:
+        leastCount = int(clientCount)
+        emit('clientIncrement', clientCount, broadcast=True)
+    elif int(clientCount) == 0:
+        emit('clientIncrement', leastCount, broadcast=True)
 
 
 if __name__ == '__main__':
