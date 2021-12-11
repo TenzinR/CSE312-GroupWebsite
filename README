@@ -39,9 +39,10 @@ Section 4 (Documentation)
   - Flask 
     - App.route()
     - Request()
-    - Render_template
+    - Render_template()
     - Flask Socket IO
     - Redirect()/Url_for()
+    - Flash()
   - PyMongo
   - Cloudinary
   - Dotenv
