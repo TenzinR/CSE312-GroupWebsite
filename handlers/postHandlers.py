@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 
 def uploadImage(img):
     load_dotenv()
-    cloudinary.config(cloud_name=os.getenv('CLOUD_NAME'),
-                      api_key=os.getenv('API_KEY'),
-                      api_secret=os.getenv('API_SECRET'))
+    cloudinary.config(cloud_name='dyew63zhz',
+                      api_key='359156874569846',
+                      api_secret='7NLtZN1456gmYD_s_Kl-6YhL7BU')
     result = cloudinary.uploader.upload(img)
     return result
 
